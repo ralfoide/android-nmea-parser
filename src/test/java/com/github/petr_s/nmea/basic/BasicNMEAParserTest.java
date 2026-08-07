@@ -3,7 +3,7 @@ package com.github.petr_s.nmea.basic;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,9 +11,9 @@ import java.util.HashSet;
 import static com.github.petr_s.nmea.Helper.eq;
 import static com.github.petr_s.nmea.Helper.roughlyEq;
 import static com.github.petr_s.nmea.basic.BasicNMEAHandler.FixType.Fix3D;
-import static org.mockito.Matchers.doubleThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.floatThat;
+import static org.mockito.ArgumentMatchers.doubleThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.floatThat;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.*;
 
