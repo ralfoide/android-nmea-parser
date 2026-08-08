@@ -16,6 +16,7 @@ public class BasicNMEAParser {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("ddMMyy", Locale.US);
     private static final String COMMA = ",";
     private static final String CAP_FLOAT = "(\\d*[.]?\\d+)";
+    private static final String NEG_FLOAT = "([-]?\\d*[.]?\\d+)";
     private static final String HEX_INT = "[0-9a-fA-F]";
     private static final Pattern GENERAL_SENTENCE = Pattern.compile("^\\$(\\w{5}),(.*)[*](" + HEX_INT + "{2})$");
     private static final Pattern GPRMC = Pattern.compile("(\\d{5})?" +
@@ -30,7 +31,8 @@ public class BasicNMEAParser {
             "(\\d{6})?" + COMMA +
             CAP_FLOAT + "?" + COMMA +
             regexify(HDir.class) + "?" + COMMA + "?" +
-            regexify(FFA.class) + "?");
+            regexify(FFA.class) + "?" + COMMA + "?" +
+            regexify(NSI.class) + "?");
     private static final Pattern GPGGA = Pattern.compile("(\\d{5})?" +
             "(\\d[.]?\\d*)?" + COMMA +
             "(\\d{2})(\\d{2}[.]\\d+)?" + COMMA +
@@ -40,8 +42,8 @@ public class BasicNMEAParser {
             "(\\d)?" + COMMA +
             "(\\d{2})?" + COMMA +
             CAP_FLOAT + "?" + COMMA +
-            CAP_FLOAT + "?,[M]" + COMMA +
-            CAP_FLOAT + "?,[M]" + COMMA +
+            NEG_FLOAT + "?,[M]" + COMMA +
+            NEG_FLOAT + "?,[M]" + COMMA +
             CAP_FLOAT + "?" + COMMA +
             "(\\d{4})?");
     private static final Pattern GPGSV = Pattern.compile("(\\d+)" + COMMA +
@@ -147,9 +149,11 @@ public class BasicNMEAParser {
                 float speed = matcher.nextFloat("speed") * KNOTS2MPS;
                 float direction = matcher.nextFloat("direction", 0.0f);
                 long date = DATE_FORMAT.parse(matcher.nextString("date")).getTime();
-                Float magVar = matcher.nextFloat("magnetic-variation");
-                String magVarDir = matcher.nextString("direction");
-                String faa = matcher.nextString("faa");
+                // Skip fields we don't use
+                // Float magVar = matcher.nextFloat("magnetic-variation");
+                // String magVarDir = matcher.nextString("direction");
+                // String ffa = matcher.nextString("ffa");
+                // String nsi = matcher.nextString("nsi");
 
                 handler.onRMC(date,
                         time,
@@ -184,8 +188,9 @@ public class BasicNMEAParser {
             float hdop = matcher.nextFloat("hdop");
             float altitude = matcher.nextFloat("altitude");
             float separation = matcher.nextFloat("separation");
-            Float age = matcher.nextFloat("age");
-            Integer station = matcher.nextInt("station");
+            // Skip fields we don't use
+            // Float age = matcher.nextFloat("age");
+            // Integer station = matcher.nextInt("station");
 
             handler.onGGA(time,
                     vDir.equals(VDir.N) ? latitude : -latitude,
@@ -330,6 +335,15 @@ public class BasicNMEAParser {
         M,
         S,
         N
+    }
+
+    private enum NSI {
+        // Navigational Status Indicator
+        // Field 14 in GNRMC
+        S,  // Safe
+        C,  // Caution
+        U,  // Unsafe
+        V   // Void
     }
 
     private static abstract class ParsingFunction {
