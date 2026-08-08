@@ -88,28 +88,30 @@ public class BasicNMEAParser {
             CAP_FLOAT + "?");
     private static HashMap<String, ParsingFunction> functions = new HashMap<>();
 
+    private static final Pattern TYPES = Pattern.compile("^[A-Z]{2}(RMC|GGA|GSV|GSA)$");
+
     static {
         TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-        functions.put("GPRMC", new ParsingFunction() {
+        functions.put("RMC", new ParsingFunction() {
             @Override
             public boolean parse(BasicNMEAHandler handler, String sentence) throws Exception {
                 return parseGPRMC(handler, sentence);
             }
         });
-        functions.put("GPGGA", new ParsingFunction() {
+        functions.put("GGA", new ParsingFunction() {
             @Override
             public boolean parse(BasicNMEAHandler handler, String sentence) throws Exception {
                 return parseGPGGA(handler, sentence);
             }
         });
-        functions.put("GPGSV", new ParsingFunction() {
+        functions.put("GSV", new ParsingFunction() {
             @Override
             public boolean parse(BasicNMEAHandler handler, String sentence) throws Exception {
                 return parseGPGSV(handler, sentence);
             }
         });
-        functions.put("GPGSA", new ParsingFunction() {
+        functions.put("GSA", new ParsingFunction() {
             @Override
             public boolean parse(BasicNMEAHandler handler, String sentence) throws Exception {
                 return parseGPGSA(handler, sentence);
@@ -283,9 +285,12 @@ public class BasicNMEAParser {
                 int expected_checksum = matcher.nextHexInt("checksum");
                 int actual_checksum = calculateChecksum(sentence);
 
+                ExMatcher typeMatcher = new ExMatcher(TYPES.matcher(type));
+                String format = typeMatcher.matches() ? typeMatcher.nextString("format") : "";
+
                 if (actual_checksum != expected_checksum) {
                     handler.onBadChecksum(expected_checksum, actual_checksum);
-                } else if (!functions.containsKey(type) || !functions.get(type).parse(handler, content)) {
+                } else if (!functions.containsKey(format) || !functions.get(format).parse(handler, content)) {
                     handler.onUnrecognized(sentence);
                 }
             } else {
