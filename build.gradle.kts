@@ -7,6 +7,8 @@ android {
     namespace = "com.github.petr_s.nmea"
     compileSdk = 37
 
+    enableKotlin = false
+
     defaultConfig {
         minSdk = 21
     }
