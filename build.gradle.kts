@@ -1,10 +1,9 @@
 plugins {
-    id("com.android.library")
-    id("jacoco")
+    alias(libs.plugins.android.library)
 }
 
 android {
-    namespace = "com.github.petr_s.nmea"
+    namespace = "com.github.petr_s.nmea.fork"
     compileSdk = 37
 
     enableKotlin = false
@@ -12,15 +11,9 @@ android {
     defaultConfig {
         minSdk = 21
     }
-
-    buildTypes {
-        getByName("debug") {
-            // testCoverageEnabled = true
-        }
-    }
 }
 
 dependencies {
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.mockito:mockito-core:5.20.0")
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
 }
